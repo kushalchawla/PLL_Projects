@@ -1,5 +1,4 @@
 package com.eclipse.preprocess;
-
 public class Add {
 	//return addition of all integers in the array arr 
 		public int add(int[] arr)
