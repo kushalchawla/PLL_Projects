@@ -34,6 +34,7 @@ public class ValidateFusion {
 					System.out.println("state detected from ADD");
 				else
 					System.out.println("state not detected from ADD");
+				break;
 		
 		default: System.out.println("Invalid operation selected :/");
 		
