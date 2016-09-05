@@ -9,7 +9,7 @@ public class StringToInt {
 		String bin = "00010111";
 		StringToInt obj = new StringToInt();
 		int res = obj.convert(bin);
-		System.out.println(res);	
+		System.out.println(res); 	
 	}
 
 }
