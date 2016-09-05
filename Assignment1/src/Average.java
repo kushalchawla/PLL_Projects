@@ -20,3 +20,4 @@ public class Average {
 		System.out.println(result);
 	}
 }
+//code ends here.
