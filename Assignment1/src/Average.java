@@ -1,7 +1,7 @@
 
 public class Average {
 
-	//return average of all integers in arr
+	//return back average of all integers in arr
 	public float average(int[] arr)
 	{
 		float result=0;
