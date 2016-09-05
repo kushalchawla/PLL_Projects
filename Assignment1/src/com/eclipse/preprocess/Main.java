@@ -8,10 +8,10 @@ class GlobalInfo {
 	public static Object enqueueLock = new Object();
 }
 
-class Input implements Runnable {
+class Sensor implements Runnable {
 	int deviceNumber;
 	
-	public Input(int threadNumber) {
+	public Sensor(int threadNumber) {
 		deviceNumber = threadNumber;
 	}
 	
@@ -22,29 +22,83 @@ class Input implements Runnable {
 		int rawData;
 		
 		while(true) {
+//			try {
+//				Thread.sleep(1000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+			
+			rawData = converter.convert(generator.generate());
+			
+			synchronized(GlobalInfo.enqueueLock){
+				System.out.format("%d ko Lock milaa\n",deviceNumber);
+				GlobalInfo.inputs[deviceNumber] = rawData;
+				GlobalInfo.pipeLine.add(GlobalInfo.inputs);				
+			}
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
-			rawData = converter.convert(generator.generate());
-			synchronized(GlobalInfo.enqueueLock){
-				GlobalInfo.inputs[deviceNumber] = rawData;
-				GlobalInfo.pipeLine.add(GlobalInfo.inputs);
-			}
 		}
 	}
 }
 class DataFusion implements Runnable {
 	public void run() {
+		boolean flag = true;
+		while(flag) {
+			flag = false;
+			for (int i = 0; i < 10; i++) {
+				if(GlobalInfo.inputs[i]==-1)
+					flag = true;
+			}
+		}
 		
+		int[] snapshot = new int[10];
+		Add adder = new Add();
+		Multiply multiplier = new Multiply();
+		Average averager = new Average();
+		
+		while(true) {
+			if(GlobalInfo.pipeLine.peek() != null)
+			{
+				snapshot = GlobalInfo.pipeLine.poll();
+				
+				System.out.format("The snapshot is: ");
+				for (int i = 0; i < snapshot.length; i++) {
+					System.out.format("%d,", snapshot[i]);
+				}
+				System.out.println();
+				
+				adder.add(snapshot);
+				multiplier.multiply(snapshot);
+				averager.average(snapshot);
+				
+				
+			}
+			
+		}
 	}
 }
 public class Main {
 
 	public static void main(String[] args) {
+		System.out.println("main started...");
+		for (int i = 0; i < 10; i++) {
+			GlobalInfo.inputs[i] = -1;
+		}
 		
+		DataFusion processor = new DataFusion();
+		Thread processThread = new Thread(processor);
+		processThread.start();	
+		
+		
+		for (int threadNo = 0; threadNo < 10; threadNo++) {
+			Sensor obj = new Sensor(threadNo);
+			Thread t = new Thread(obj);
+			t.start();
+		}
 
 	}
 
