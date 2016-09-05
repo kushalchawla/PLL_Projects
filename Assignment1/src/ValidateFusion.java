@@ -41,7 +41,11 @@ public class ValidateFusion {
 	}
 	public static void main(String[] args) {
 		
-
+		ValidateFusion obj = new ValidateFusion();
+		obj.validate(10000, 0);
+		obj.validate(10000, 1);
+		obj.validate(10000, 2);
+		obj.validate(10000, 3);
 	}
-
+		
 }
