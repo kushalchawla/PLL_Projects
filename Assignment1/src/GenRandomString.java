@@ -1,6 +1,6 @@
 import java.util.Random;
 
-public class gen_random_string {
+public class GenRandomString {
 
 	public String generate()
 	{
@@ -17,9 +17,9 @@ public class gen_random_string {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		gen_random_string obj=new gen_random_string();
-		String random_str=obj.generate();
-		System.out.println(random_str);
+		GenRandomString obj=new GenRandomString();
+		String randomStr=obj.generate();
+		System.out.println(randomStr);
 	}
 
 }
