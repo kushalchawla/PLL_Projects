@@ -10,7 +10,7 @@ public class StringToInt {
 		StringToInt obj = new StringToInt();
 		int res = obj.convert(bin);
 		System.out.println(res);
-
+	
 	}
 
 }
