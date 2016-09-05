@@ -1,4 +1,4 @@
-
+package com.eclipse.preprocess;
 public class Multiply {
 
 	//return multiplication of all integers in the array arr 
@@ -8,7 +8,8 @@ public class Multiply {
 		for (int i = 0; i < arr.length; i++) {
 			result = result * arr[i];
 		}
-		
+		ValidateFusion validator = new ValidateFusion();
+		validator.validate(result, 1);
 		return result;
 	}
 		

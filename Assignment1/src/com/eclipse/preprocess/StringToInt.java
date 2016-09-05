@@ -1,3 +1,4 @@
+package com.eclipse.preprocess;
 public class StringToInt {
 
 	//function to convert a binary string to the corresponding integer value

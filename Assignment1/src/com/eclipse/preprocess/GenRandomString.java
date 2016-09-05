@@ -1,3 +1,5 @@
+package com.eclipse.preprocess;
+
 import java.util.Random;
 
 public class GenRandomString {

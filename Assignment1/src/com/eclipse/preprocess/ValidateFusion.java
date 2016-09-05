@@ -1,4 +1,4 @@
-
+package com.eclipse.preprocess;
 public class ValidateFusion {
 
 	float AVG; 

@@ -1,4 +1,4 @@
-
+package com.eclipse.preprocess;
 public class Average {
 
 	//return average of all integers in arr
@@ -9,7 +9,10 @@ public class Average {
 			result = result + arr[i];
 		}
 		
-		return (result/arr.length);
+		result = result/arr.length;
+		ValidateFusion validator = new ValidateFusion(); 
+		validator.validate(result, 0);
+		return (result);
 	}
 	
 	public static void main(String[] args) {

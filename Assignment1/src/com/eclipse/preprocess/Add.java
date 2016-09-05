@@ -1,3 +1,4 @@
+package com.eclipse.preprocess;
 
 public class Add {
 	//return addition of all integers in the array arr 
@@ -7,7 +8,8 @@ public class Add {
 			for (int i = 0; i < arr.length; i++) {
 				result = result + arr[i];
 			}
-			
+			ValidateFusion validator = new ValidateFusion(); 
+			validator.validate(result, 2);
 			return result;
 		}
 		
