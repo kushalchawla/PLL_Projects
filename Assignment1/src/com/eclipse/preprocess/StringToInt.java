@@ -30,7 +30,7 @@ public class StringToInt {
      * @param args Input from console. 
      */
 	public static void main(String[] args) {		
-		String bin = "00010111";
+		String bin = "10010111";
 		StringToInt obj = new StringToInt();
 		int res = obj.convert(bin);
 		System.out.println(res); 	

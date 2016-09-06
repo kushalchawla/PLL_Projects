@@ -103,6 +103,7 @@ class DataFusion implements Runnable {
 			{
 				snapshot = GlobalInfo.pipeLine.poll();
 				
+				//printing snapshot
 				System.out.format("The snapshot is: ");
 				for (int i = 0; i < snapshot.length; i++) {
 					System.out.format("%d,", snapshot[i]);
@@ -113,12 +114,14 @@ class DataFusion implements Runnable {
 				
 				SortHelper.sortForkAndJoin(sortedSnapshot);
 				
+				//printing sorted snapshot
 				System.out.format("The sorted snapshot is: ");
 				for (int i = 0; i < sortedSnapshot.length; i++) {
 					System.out.format("%d,", sortedSnapshot[i]);
 				}
 				System.out.println();
 				
+				// Performing fusion of data and validating results
 				sum = adder.addConcurrent1(sortedSnapshot);			 
 				validator.validate(sum, 2);
 				
@@ -128,7 +131,7 @@ class DataFusion implements Runnable {
 				avg = averager.averageConcurrent1(sortedSnapshot); 
 				validator.validate(avg, 0);
 				
-//				System.out.println();
+				System.out.println();
 				
 				try {
 					Thread.sleep(1000);

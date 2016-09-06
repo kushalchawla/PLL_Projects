@@ -1,8 +1,20 @@
+/**
+ * CS 431  Assignment 1
+ * AddConcurrent1.java
+ * Purpose: Add integers in an array using Thread/Runnable for concurrency.
+ *
+ * @version 1.1 2016
+ * @author Ajinkya and Kushal
+ */
 package com.eclipse.preprocess;
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
+/**
+ * Class to implement sorting using Fork-and-Join
+ *
+ */
 public class SortHelper extends RecursiveAction{
 
 	private int[] mSource;
@@ -11,6 +23,13 @@ public class SortHelper extends RecursiveAction{
     private int mLength;
     private int[] mDestination;
    
+    /**
+     * class constructor
+     * @param src array to be sorted
+     * @param start starting index of array
+     * @param end ending index of array
+     * @param dst array to store the result
+     */
     public SortHelper(int[] src, int start, int end, int[] dst) {
     	mSource = src;
     	mStart = start;
@@ -20,6 +39,10 @@ public class SortHelper extends RecursiveAction{
     }
     
     protected static int sThreshold = 2;
+    /* (non-Javadoc)
+     * @see java.util.concurrent.RecursiveAction#compute()
+     * overrided function- to implement merge sort
+     */
     @Override
     protected void compute() {
     	if(mLength < sThreshold) {
@@ -56,6 +79,9 @@ public class SortHelper extends RecursiveAction{
     	
     }
     
+	/**
+	 * @param src Array to be sorted
+	 */
 	public static void sortForkAndJoin(int[] src) {
 		int[] dst = new int[src.length];
 	
@@ -65,6 +91,9 @@ public class SortHelper extends RecursiveAction{
 		pool.invoke(sh);
 		
 	}
+	/** Main function used for testing
+	 * @param args input from console
+	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		int[] arr = {23,45,2312,14,5,24,64,235,86};
