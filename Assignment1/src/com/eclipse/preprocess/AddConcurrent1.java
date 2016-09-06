@@ -102,7 +102,6 @@ public class AddConcurrent1 {
 		return GlobalInfoAdd1.result;
 	}
 	
-	
 	/**
      * Main function used for testing.
      * 
