@@ -91,9 +91,9 @@ class DataFusion implements Runnable {
 		int[] sortedSnapshot;
 		int sum,mul;
 		float avg;
-		Add adder = new Add();
-		Multiply multiplier = new Multiply();
-		Average averager = new Average();
+		AddConcurrent1 adder = new AddConcurrent1();
+		MultiplyConcurrent1 multiplier = new MultiplyConcurrent1();
+		AverageConcurrent1 averager = new AverageConcurrent1();
 		ValidateFusion validator = new ValidateFusion();		
 		
 		while(true) {
@@ -112,13 +112,13 @@ class DataFusion implements Runnable {
 				sortedSnapshot = Arrays.copyOf(snapshot, snapshot.length);
 				
 				
-				sum = adder.add(sortedSnapshot);			 
+				sum = adder.addConcurrent1(sortedSnapshot);			 
 				validator.validate(sum, 2);
 				
-				mul = multiplier.multiply(sortedSnapshot);
+				mul = multiplier.multiplyConcurrent1(sortedSnapshot);
 				validator.validate(mul, 1);
 				
-				avg = averager.average(sortedSnapshot); 
+				avg = averager.averageConcurrent1(sortedSnapshot); 
 				validator.validate(avg, 0);
 				
 				try {
