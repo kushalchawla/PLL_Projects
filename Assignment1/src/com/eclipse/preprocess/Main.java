@@ -50,7 +50,7 @@ class Sensor implements Runnable {
 			
 			//synchronization to make sure that queue is filled up in the correct order.
 			synchronized(GlobalInfo.enqueueLock){
-				System.out.format("%d ko Lock milaa\n",deviceNumber);
+				System.out.format("%d got the lock.\n",deviceNumber);
 				GlobalInfo.inputs[deviceNumber] = rawData;
 				GlobalInfo.pipeLine.add(GlobalInfo.inputs);				
 			}
