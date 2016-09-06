@@ -4,9 +4,13 @@ import java.util.Random;
 
 public class GenRandomString {
 
+	Random rg;
+	public GenRandomString(){
+		rg = new Random();
+	}
 	public String generate()
 	{
-		Random rg = new Random();
+		rg.setSeed(System.nanoTime());
 	    int x;
 	    char[] arr=new char[8];
 	    for (int i = 0; i < arr.length; i++) {

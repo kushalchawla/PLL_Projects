@@ -35,8 +35,9 @@ class Sensor implements Runnable {
 				GlobalInfo.inputs[deviceNumber] = rawData;
 				GlobalInfo.pipeLine.add(GlobalInfo.inputs);				
 			}
+			
 			try {
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -74,8 +75,11 @@ class DataFusion implements Runnable {
 				adder.add(snapshot);
 				multiplier.multiply(snapshot);
 				averager.average(snapshot);
-				
-				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 			
 		}
