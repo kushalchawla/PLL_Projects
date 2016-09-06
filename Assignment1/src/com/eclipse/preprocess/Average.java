@@ -1,7 +1,24 @@
+/**
+ * CS 431  Assignment 1
+ * Average.java
+ * Purpose: Average integers in an array
+ *
+ * @version 1.1 2016
+ * @author Ajinkya and Kushal
+ */
 package com.eclipse.preprocess;
+
+/**
+ * Class to implement average of integers in an array
+ */
 public class Average {
 
-	//return average of all integers in arr
+	/**
+     * Function for taking average of integers in an array.
+     * 
+     * @param arr An array containing integers.
+     * @return Average of all integers in the input array. 
+     */
 	public float average(int[] arr)
 	{
 		float result=0;
@@ -10,11 +27,19 @@ public class Average {
 		}
 		
 		result = result/arr.length;
+		
+		//validate the average using the threshold 
 		ValidateFusion validator = new ValidateFusion(); 
 		validator.validate(result, 0);
+		
 		return (result);
 	}
 	
+	/**
+     * Main Function of Average class used for testing.
+     * 
+     * @param args Input from console. 
+     */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		int[] arr={25,50,100,7};

@@ -1,19 +1,49 @@
+/**
+ * CS 431  Assignment 1
+ * ValidateFusion.java
+ * Purpose: Validate results using a threshold
+ *
+ * @version 1.1 2016
+ * @author Ajinkya and Kushal
+ */
 package com.eclipse.preprocess;
+
+/**
+ * Class to implement validation of results
+ */
 public class ValidateFusion {
 
-	float AVG; 
+	float AVG;
 	int MUL,ADD;
 	
+	/**
+     * Constructor to set initial thresholds according to prior suggested values. 
+     */
 	public ValidateFusion() {
 		AVG = 100;
 		MUL = 100000;
 		ADD = 10000;
 	}
+	
+	/**
+     * Function to change threshold values if necessary.
+     * 
+     * @param NEW_AVG New value for average threshold.
+     * @param NEW_MUL New value for multiply threshold.
+     * @param NEW_ADD New value for add threshold. 
+     */
 	public void setThresholds(float NEW_AVG, int NEW_MUL, int NEW_ADD) {
 		AVG = NEW_AVG;
 		MUL = NEW_MUL;
 		ADD = NEW_ADD;
 	}
+	
+	/**
+     * Function to validate and print output messages.
+     * 
+     * @param val Value to be compared with the threshold.
+     * @param flag To check fusion method. 
+     */
 	public void validate( float val , int flag ) {
 		
 		switch(flag) {
@@ -40,6 +70,12 @@ public class ValidateFusion {
 		
 		}
 	}
+	
+	/**
+     * Main Function used for testing.
+     * 
+     * @param args Input from console. 
+     */
 	public static void main(String[] args) {
 		
 		ValidateFusion obj = new ValidateFusion();
