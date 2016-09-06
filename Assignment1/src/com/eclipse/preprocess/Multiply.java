@@ -24,12 +24,7 @@ public class Multiply {
 		int result=1;
 		for (int i = 0; i < arr.length; i++) {
 			result = result * arr[i];
-		}
-		
-		//validate the multiplication using the threshold
-		ValidateFusion validator = new ValidateFusion();
-		validator.validate(result, 1);
-		
+		}		
 		return result;
 	}
 	

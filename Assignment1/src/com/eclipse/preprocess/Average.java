@@ -26,12 +26,7 @@ public class Average {
 			result = result + arr[i];
 		}
 		
-		result = result/arr.length;
-		
-		//validate the average using the threshold 
-		ValidateFusion validator = new ValidateFusion(); 
-		validator.validate(result, 0);
-		
+		result = result/arr.length;		
 		return (result);
 	}
 	

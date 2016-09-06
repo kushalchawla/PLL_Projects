@@ -7,6 +7,7 @@
  * @author Ajinkya and Kushal
  */
 package com.eclipse.preprocess;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -87,9 +88,13 @@ class DataFusion implements Runnable {
 		}
 		
 		int[] snapshot = new int[10];
+		int[] sortedSnapshot;
+		int sum,mul;
+		float avg;
 		Add adder = new Add();
 		Multiply multiplier = new Multiply();
 		Average averager = new Average();
+		ValidateFusion validator = new ValidateFusion();		
 		
 		while(true) {
 			
@@ -104,9 +109,18 @@ class DataFusion implements Runnable {
 				}
 				System.out.println();
 				
-				adder.add(snapshot);
-				multiplier.multiply(snapshot);
-				averager.average(snapshot);
+				sortedSnapshot = Arrays.copyOf(snapshot, snapshot.length);
+				
+				
+				sum = adder.add(sortedSnapshot);			 
+				validator.validate(sum, 2);
+				
+				mul = multiplier.multiply(sortedSnapshot);
+				validator.validate(mul, 1);
+				
+				avg = averager.average(sortedSnapshot); 
+				validator.validate(avg, 0);
+				
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {

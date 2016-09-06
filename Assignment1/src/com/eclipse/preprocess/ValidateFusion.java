@@ -49,21 +49,21 @@ public class ValidateFusion {
 		switch(flag) {
 		
 		case 0: if( val > AVG )
-					System.out.println("state detected from AVG");
+					System.out.format("state detected from AVG : %f\n",val);
 				else
-					System.out.println("state not detected from AVG");
+					System.out.format("state not detected from AVG : %f\n",val);
 				break;
 		
 		case 1: if( (int)(val) > MUL)
-					System.out.println("state detected from MUL");
+					System.out.format("state detected from MUL : %d\n",(int)val);
 				else
-					System.out.println("state not detected from MUL");
+					System.out.format("state not detected from MUL : %d\n",(int)val);
 				break;
 		
 		case 2: if( (int)(val) > ADD) 
-					System.out.println("state detected from ADD");
+					System.out.format("state detected from ADD : %d\n",(int)val);
 				else
-					System.out.println("state not detected from ADD");
+					System.out.format("state not detected from ADD : %d\n",(int)val);
 				break;
 		
 		default: System.out.println("Invalid operation selected :/");

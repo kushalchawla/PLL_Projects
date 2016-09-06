@@ -25,11 +25,6 @@ public class Add {
 		for (int i = 0; i < arr.length; i++) {
 			result = result + arr[i];
 		}
-		
-		//validate the addition using the threshold
-		ValidateFusion validator = new ValidateFusion(); 
-		validator.validate(result, 2);
-		
 		return result;
 	}
 	
