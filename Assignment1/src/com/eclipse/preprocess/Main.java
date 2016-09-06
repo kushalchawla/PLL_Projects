@@ -51,7 +51,7 @@ class Sensor implements Runnable {
 			
 			//synchronization to make sure that queue is filled up in the correct order.
 			synchronized(GlobalInfo.enqueueLock){
-				System.out.format("%d ko Lock milaa\n",deviceNumber);
+				System.out.format("%d got the lock.\n",deviceNumber);
 				GlobalInfo.inputs[deviceNumber] = rawData;
 				GlobalInfo.pipeLine.add(GlobalInfo.inputs);				
 			}
@@ -91,11 +91,10 @@ class DataFusion implements Runnable {
 		int[] sortedSnapshot;
 		int sum,mul;
 		float avg;
-		// instantiating helper classes
-		Add adder = new Add();
-		Multiply multiplier = new Multiply();
-		Average averager = new Average();
-		ValidateFusion validator = new ValidateFusion();
+		AddConcurrent1 adder = new AddConcurrent1();
+		MultiplyConcurrent1 multiplier = new MultiplyConcurrent1();
+		AverageConcurrent1 averager = new AverageConcurrent1();
+		ValidateFusion validator = new ValidateFusion();		
 		
 		while(true) {
 			
@@ -104,37 +103,32 @@ class DataFusion implements Runnable {
 			{
 				snapshot = GlobalInfo.pipeLine.poll();
 				
-				//printing the snapshot
 				System.out.format("The snapshot is: ");
 				for (int i = 0; i < snapshot.length; i++) {
 					System.out.format("%d,", snapshot[i]);
 				}
 				System.out.println();
 				
-				//making a copy of snapshot to sort
 				sortedSnapshot = Arrays.copyOf(snapshot, snapshot.length);
 				
-				//sorting the copy of snapshot using Fork and Join
 				SortHelper.sortForkAndJoin(sortedSnapshot);
 				
-				//printing the sorted snapshot
 				System.out.format("The sorted snapshot is: ");
 				for (int i = 0; i < sortedSnapshot.length; i++) {
-					System.out.format("%d, ", sortedSnapshot[i]);
+					System.out.format("%d,", sortedSnapshot[i]);
 				}
 				System.out.println();
 				
-				//performing fusions and validating them				
-				sum = adder.add(sortedSnapshot);			 
+				sum = adder.addConcurrent1(sortedSnapshot);			 
 				validator.validate(sum, 2);
 				
-				mul = multiplier.multiply(sortedSnapshot);
+				mul = multiplier.multiplyConcurrent1(sortedSnapshot);
 				validator.validate(mul, 1);
 				
-				avg = averager.average(sortedSnapshot); 
+				avg = averager.averageConcurrent1(sortedSnapshot); 
 				validator.validate(avg, 0);
 				
-				System.out.println();
+//				System.out.println();
 				
 				try {
 					Thread.sleep(1000);
@@ -167,7 +161,6 @@ public class Main {
 		Thread processThread = new Thread(processor);
 		processThread.start();	
 		
-		//creating threads corresponding to each sensor
 		for (int threadNo = 0; threadNo < 10; threadNo++) {
 			Sensor obj = new Sensor(threadNo);
 			Thread t = new Thread(obj);
