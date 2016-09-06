@@ -91,10 +91,11 @@ class DataFusion implements Runnable {
 		int[] sortedSnapshot;
 		int sum,mul;
 		float avg;
+		// instantiating helper classes
 		Add adder = new Add();
 		Multiply multiplier = new Multiply();
 		Average averager = new Average();
-		ValidateFusion validator = new ValidateFusion();		
+		ValidateFusion validator = new ValidateFusion();
 		
 		while(true) {
 			
@@ -103,15 +104,27 @@ class DataFusion implements Runnable {
 			{
 				snapshot = GlobalInfo.pipeLine.poll();
 				
+				//printing the snapshot
 				System.out.format("The snapshot is: ");
 				for (int i = 0; i < snapshot.length; i++) {
 					System.out.format("%d,", snapshot[i]);
 				}
 				System.out.println();
 				
+				//making a copy of snapshot to sort
 				sortedSnapshot = Arrays.copyOf(snapshot, snapshot.length);
 				
+				//sorting the copy of snapshot using Fork and Join
+				SortHelper.sortForkAndJoin(sortedSnapshot);
 				
+				//printing the sorted snapshot
+				System.out.format("The sorted snapshot is: ");
+				for (int i = 0; i < sortedSnapshot.length; i++) {
+					System.out.format("%d, ", sortedSnapshot[i]);
+				}
+				System.out.println();
+				
+				//performing fusions and validating them				
 				sum = adder.add(sortedSnapshot);			 
 				validator.validate(sum, 2);
 				
@@ -120,6 +133,8 @@ class DataFusion implements Runnable {
 				
 				avg = averager.average(sortedSnapshot); 
 				validator.validate(avg, 0);
+				
+				System.out.println();
 				
 				try {
 					Thread.sleep(1000);
@@ -152,6 +167,7 @@ public class Main {
 		Thread processThread = new Thread(processor);
 		processThread.start();	
 		
+		//creating threads corresponding to each sensor
 		for (int threadNo = 0; threadNo < 10; threadNo++) {
 			Sensor obj = new Sensor(threadNo);
 			Thread t = new Thread(obj);
