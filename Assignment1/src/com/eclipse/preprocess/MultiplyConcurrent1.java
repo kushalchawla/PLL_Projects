@@ -49,6 +49,11 @@ class IntermediateMultiply1 implements Runnable {
 		} else{
 			GlobalInfoMultiply1.result2 = result; 
 		}
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
 
@@ -66,6 +71,11 @@ class CombineMultiply1 implements Runnable {
 		}
 		GlobalInfoMultiply1.result = GlobalInfoMultiply1.result1 * GlobalInfoMultiply1.result2;
 		GlobalInfoMultiply1.complete = true;
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
 
@@ -98,6 +108,11 @@ public class MultiplyConcurrent1 {
 		combineResultsThread.start();
 		while(GlobalInfoMultiply1.complete == false){
 			//wait for the final thread to return.
+		}
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		return GlobalInfoMultiply1.result;
 	}

@@ -1,11 +1,12 @@
 /**
  * CS 431  Assignment 1
- * Main.java
+ * MainConcurrent1.java
  * Purpose: Perform complete task by taking inputs, pre-processing, fusing and output.
  *
  * @version 1.1 2016
  * @author Ajinkya and Kushal
  */
+
 package com.eclipse.preprocess;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ class GlobalInfo {
 	public static int[] inputs = new int[10];
 	public static Queue<int[]> pipeLine = new LinkedList<int[]>();
 	public static Object enqueueLock = new Object();
+	public static int completeThreads;
 }
 
 /**
@@ -57,7 +59,7 @@ class Sensor implements Runnable {
 			}
 			
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -65,6 +67,111 @@ class Sensor implements Runnable {
 		}
 	}
 }
+
+/**
+ * Class to implement thread for addition fusion process
+ */
+class fuseAdd1 implements Runnable {
+	int[] sortedSnapshot;
+	
+	/**
+     * Constructor to set the array.
+     * 
+     * @param sortedSnapshot the sorted integer array
+     */
+	public fuseAdd1(int[] sortedSnapshot) {
+		this.sortedSnapshot = sortedSnapshot;
+	}
+	
+	/**
+     * Run function of the thread called within start function.
+     * 
+     */
+	public void run() {
+		System.out.println("fuseAdd");
+		AddConcurrent1 adder = new AddConcurrent1();
+		ValidateFusion validator = new ValidateFusion();
+		int sum = adder.addConcurrent1(sortedSnapshot);			 
+		validator.validate(sum, 2);
+		GlobalInfo.completeThreads++;
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+/**
+ * Class to implement thread for multiplier fusion process
+ */
+class fuseMultiply1 implements Runnable {
+	int[] sortedSnapshot;
+	
+	/**
+     * Constructor to set the array.
+     * 
+     * @param sortedSnapshot the sorted integer array
+     */
+	public fuseMultiply1(int[] sortedSnapshot) {
+		this.sortedSnapshot = sortedSnapshot;
+	}
+	
+	/**
+     * Run function of the thread called within start function.
+     * 
+     */
+	public void run() {
+		System.out.println("fuseMul");
+		MultiplyConcurrent1 multiplier = new MultiplyConcurrent1();
+		ValidateFusion validator = new ValidateFusion();
+		int mul = multiplier.multiplyConcurrent1(sortedSnapshot);			 
+		validator.validate(mul, 1);
+		GlobalInfo.completeThreads++;
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+
+/**
+ * Class to implement thread for average fusion process
+ */
+class fuseAverage1 implements Runnable {
+	int[] sortedSnapshot;
+	
+	/**
+     * Constructor to set the array.
+     * 
+     * @param sortedSnapshot the sorted integer array
+     */
+	public fuseAverage1(int[] sortedSnapshot) {
+		this.sortedSnapshot = sortedSnapshot;
+	}
+	
+	/**
+     * Run function of the thread called within start function.
+     * 
+     */
+	public void run() {
+		System.out.println("fuseAvg");
+		AverageConcurrent1 averager = new AverageConcurrent1();
+		ValidateFusion validator = new ValidateFusion();
+		float avg = averager.averageConcurrent1(sortedSnapshot);			 
+		validator.validate(avg, 0);
+		GlobalInfo.completeThreads++;
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+
 
 /**
  * Class to implement thread for Fusion process
@@ -89,12 +196,7 @@ class DataFusion implements Runnable {
 		
 		int[] snapshot = new int[10];
 		int[] sortedSnapshot;
-		int sum,mul;
-		float avg;
-		AddConcurrent1 adder = new AddConcurrent1();
-		MultiplyConcurrent1 multiplier = new MultiplyConcurrent1();
-		AverageConcurrent1 averager = new AverageConcurrent1();
-		ValidateFusion validator = new ValidateFusion();		
+				
 		
 		while(true) {
 			
@@ -121,20 +223,29 @@ class DataFusion implements Runnable {
 				}
 				System.out.println();
 				
+				GlobalInfo.completeThreads=0;
+				
+				
 				// Performing fusion of data and validating results
-				sum = adder.addConcurrent1(sortedSnapshot);			 
-				validator.validate(sum, 2);
+				fuseAdd1 adder = new fuseAdd1(sortedSnapshot);
+				Thread adderThread = new Thread(adder);
+				adderThread.start();
 				
-				mul = multiplier.multiplyConcurrent1(sortedSnapshot);
-				validator.validate(mul, 1);
+				fuseMultiply1 multiplier = new fuseMultiply1(sortedSnapshot);
+				Thread multiplierThread = new Thread(multiplier);
+				multiplierThread.start();
 				
-				avg = averager.averageConcurrent1(sortedSnapshot); 
-				validator.validate(avg, 0);
+				fuseAverage1 averager = new fuseAverage1(sortedSnapshot);
+				Thread averagerThread = new Thread(averager);
+				averagerThread.start();
 				
+				while(GlobalInfo.completeThreads < 3){
+					//wait for all three fusions to take place.
+				}
 				System.out.println();
 				
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -147,7 +258,7 @@ class DataFusion implements Runnable {
 /**
  * Main Class containing the main function.
  */
-public class Main {
+public class MainConcurrent1 {
 
 	/**
      * Main function of used to create threads and start the process.

@@ -24,6 +24,11 @@ public class AverageConcurrent1 {
 		
 		AddConcurrent1 adder = new AddConcurrent1();
 		int result = adder.addConcurrent1(arr);
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		return ((float)result/arr.length);
 	}
 	

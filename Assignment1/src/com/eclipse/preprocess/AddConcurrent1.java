@@ -49,6 +49,11 @@ class IntermediateAdd1 implements Runnable {
 		} else{
 			GlobalInfoAdd1.result2 = result; 
 		}
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
 
@@ -66,6 +71,11 @@ class CombineAdd1 implements Runnable {
 		}
 		GlobalInfoAdd1.result = GlobalInfoAdd1.result1 + GlobalInfoAdd1.result2;
 		GlobalInfoAdd1.complete = true;
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
 
@@ -98,6 +108,11 @@ public class AddConcurrent1 {
 		combineResultsThread.start();
 		while(GlobalInfoAdd1.complete == false){
 			//wait for the final thread to return.
+		}
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		return GlobalInfoAdd1.result;
 	}
