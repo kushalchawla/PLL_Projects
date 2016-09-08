@@ -1,8 +1,14 @@
 package calculator;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+class GlobalInfo {
+	public static Executor pool = Executors.newCachedThreadPool();
+}
 public class App {
 
 	public static void main(String[] args) {
@@ -18,8 +24,7 @@ public class App {
 			}
 		});
 		Highlighter hl = new Highlighter();
-		Highlighter.highlight();
-
+		GlobalInfo.pool.execute(hl);
 	}
 
 }
