@@ -30,7 +30,7 @@ public class AppAdvanced {
 		OpHighlighter opHl = new OpHighlighter();
 		AdvancedGlobalInfo.pool.execute(opHl);
 		
-		FuncHighLighter funcHl = new FuncHighLighter();
+		FuncHighlighter funcHl = new FuncHighlighter();
 		AdvancedGlobalInfo.pool.execute(funcHl);
 
 	}

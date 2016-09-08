@@ -16,9 +16,101 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
+import javafx.scene.input.KeyCode;
+
+class AdvancedKeyPressResponse implements Runnable {
+
+	static int highlightedNum;
+	static int highlightedFunc;
+	static int highlightedOp;
+	String labelText;
+	String toAppend;
+	String readText;
+	int keyPressed;
+	
+	public AdvancedKeyPressResponse(String text, int kp) {
+		highlightedNum = NumHighlighter.highlightedNum;
+		highlightedFunc = FuncHighlighter.highlightedFunc;
+		highlightedOp = OpHighlighter.highlightedOp;
+		readText = text;
+		keyPressed = kp;
+	}
+	public String evaluate(String str) {
+		double first = Character.getNumericValue(str.charAt(0));
+		double second = Character.getNumericValue(str.charAt(2));
+		char func = str.charAt(1);
+		String ans = "ERROR";
+		
+		switch(func) {
+		case '+':
+			ans = Integer.toString((int)first + (int)second);
+			break;
+		case '-':
+			ans = Integer.toString((int)first - (int)second);
+			break;
+		case '/':
+			if((int)second == 0)
+				ans = "ERROR";
+			else
+				ans = Double.toString(first / second);
+			break;
+		case '*':
+			ans = Integer.toString((int)first * (int)second);
+			break;
+		}
+		return ans;
+	}
+	
+	@Override
+	public void run() {
+		switch(keyPressed) {
+		case KeyEvent.VK_ENTER:
+			toAppend = Integer.toString(highlightedNum);
+			labelText = readText.concat(toAppend);
+			break;
+		case KeyEvent.VK_SPACE:
+			System.out.println("space pressed !");
+			switch(highlightedFunc) {
+			case 1: 
+				toAppend = "+";
+				break;
+			case 2: 
+				toAppend = "-";
+				break;
+			case 3: 
+				toAppend = "/";
+				break;
+			case 4: 
+				toAppend = "*";
+				break;
+			}
+			labelText = readText.concat(toAppend);
+			break;
+		case KeyEvent.VK_SHIFT:
+			switch(highlightedOp) {
+			case 1:
+				labelText = "";
+				break;
+			case 2: 
+				labelText = evaluate(readText);
+				break;
+			}
+			break;
+		}
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				CalculatorUiAdvanced.display.setText(labelText);
+			}			
+		});
+	}
+	
+}
+
 class NumHighlighter implements Runnable {
 
-	volatile int highlightedNum;
+	volatile static int highlightedNum;
 	int toReset;
 	public NumHighlighter() {		
 		highlightedNum = 1;
@@ -55,11 +147,11 @@ class NumHighlighter implements Runnable {
 	
 }
 
-class FuncHighLighter implements Runnable{
+class FuncHighlighter implements Runnable{
 
-	volatile int highlightedFunc;
+	volatile static int highlightedFunc;
 	int toReset;
-	public FuncHighLighter() {		
+	public FuncHighlighter() {		
 		highlightedFunc = 1;
 	}
 	
@@ -97,7 +189,7 @@ class FuncHighLighter implements Runnable{
 
 class OpHighlighter implements Runnable {
 
-	volatile int highlightedOp;
+	volatile static int highlightedOp;
 	int toReset;
 	
 	public OpHighlighter() {
@@ -143,9 +235,9 @@ public class CalculatorUiAdvanced extends JFrame {
 	public static Color numBg = new Color(0, 102, 153);
 	public static Color numHighlighted = new Color(255, 255, 0);
 	public static Color funcBg = UIManager.getColor("OptionPane.foreground");
-	public static Color funcHighlighted =  new Color(255, 255, 0);
-	public static Color opBg = new Color(51, 102, 255);
-	public static Color opHighlighted = new Color(255, 255, 0);
+	public static Color funcHighlighted =  new Color(0, 153, 0);
+	public static Color opBg = new Color(0, 102, 153);
+	public static Color opHighlighted = new Color(230, 59, 17);
 	
 	public static JLabel num1;
 	public static JLabel num2 ;
@@ -330,10 +422,12 @@ public class CalculatorUiAdvanced extends JFrame {
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode()==KeyEvent.VK_ENTER){
-					System.out.println("Enter key pressed");
-					KeyPressResponse kpr = new KeyPressResponse(display.getText());
-					GlobalInfo.pool.execute(kpr);
+				if (	e.getKeyCode() == KeyEvent.VK_ENTER ||
+						e.getKeyCode() == KeyEvent.VK_SPACE ||
+						e.getKeyCode() == KeyEvent.VK_SHIFT) {
+					System.out.println("Special Key Pressed\nProcessing..");
+					AdvancedKeyPressResponse kpr = new AdvancedKeyPressResponse(display.getText(), e.getKeyCode());
+					AdvancedGlobalInfo.pool.execute(kpr);
 				}
 			}
 		});
