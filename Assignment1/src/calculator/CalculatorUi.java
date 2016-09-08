@@ -1,3 +1,11 @@
+/**
+ * CS 431  Assignment 1
+ * CalculatorUI.java
+ * Purpose: To perform tasks on the calculator UI.
+ *
+ * @version 1.1 2016
+ * @author Ajinkya and Kushal
+ */
 package calculator;
 
 import java.awt.Color;
@@ -20,6 +28,9 @@ import javax.swing.border.LineBorder;
 import javafx.scene.input.KeyCode;
 import java.awt.event.KeyAdapter;
 
+/**
+ * Class to handle response to an Enter key press.
+ */
 class KeyPressResponse implements Runnable {
 
 	static int highlightedNum;
@@ -30,6 +41,10 @@ class KeyPressResponse implements Runnable {
 	String toAppend;
 	String readText;
 	
+	/**
+	 * A constructor to get the parameters from the UI for processing.
+	 * @param text to get the display text.  
+	 */
 	public KeyPressResponse(String text) {
 		highlightedNum = Highlighter.highlightedNum;
 		highlightedFunc = Highlighter.highlightedFunc;
@@ -38,6 +53,10 @@ class KeyPressResponse implements Runnable {
 		readText = text;
 	}
 	
+	/**
+	 * Function to compute the final result.
+	 * @param st String input from display to perform the evaluation.
+	 */
 	public String evaluate(String str) {
 		double first = Character.getNumericValue(str.charAt(0));
 		double second = Character.getNumericValue(str.charAt(2));
@@ -124,7 +143,9 @@ class KeyPressResponse implements Runnable {
 	}
 	
 }
-
+/**
+ * Class to handle the highlighter.
+ */
 class Highlighter implements Runnable {
 
 	static volatile int highlightedNum;
@@ -132,6 +153,9 @@ class Highlighter implements Runnable {
 	static volatile int highlightedOp;
 	static volatile int currentlyHighlighted;
 	
+	/**
+	 * Constructor to set initial value to volatile variables.
+	 */
 	public Highlighter() {
 		highlightedNum = 1;
 		highlightedFunc = 1;
@@ -300,6 +324,10 @@ class Highlighter implements Runnable {
 	}
 	
 }
+
+/**
+ * Class to handle UI.
+ */
 public class CalculatorUi extends JFrame {
 
 	private JPanel contentPane;
@@ -321,6 +349,7 @@ public class CalculatorUi extends JFrame {
 	public static JLabel div ;
 	public static JLabel mul ;
 	public static JLabel display;
+	
 	/**
 	 * Launch the application.
 	 */
