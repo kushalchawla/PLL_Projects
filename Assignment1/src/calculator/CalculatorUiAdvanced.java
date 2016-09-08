@@ -1,23 +1,14 @@
-/**
- * CS 431  Assignment 1
- * CalculatorUI.java
- * Purpose: To perform tasks on the calculator UI.
- *
- * @version 1.1 2016
- * @author Ajinkya and Kushal
- */
 package calculator;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.io.Console;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -25,315 +16,137 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-import javafx.scene.input.KeyCode;
-import java.awt.event.KeyAdapter;
+class NumHighlighter implements Runnable {
 
-/**
- * Class to handle response to an Enter key press.
- */
-class KeyPressResponse implements Runnable {
-
-	static int highlightedNum;
-	static int highlightedFunc;
-	static int highlightedOp;	
-	static int currentlyHighlighted;
-	String labelText;
-	String toAppend;
-	String readText;
-	
-	/**
-	 * A constructor to get the parameters from the UI for processing.
-	 * @param text to get the display text.  
-	 */
-	public KeyPressResponse(String text) {
-		highlightedNum = Highlighter.highlightedNum;
-		highlightedFunc = Highlighter.highlightedFunc;
-		highlightedOp = Highlighter.highlightedOp;
-		currentlyHighlighted = Highlighter.currentlyHighlighted;
-		readText = text;
+	volatile int highlightedNum;
+	int toReset;
+	public NumHighlighter() {		
+		highlightedNum = 1;
 	}
 	
-	/**
-	 * Function to compute the final result.
-	 * @param str String input from display to perform the evaluation.
-	 */
-	public String evaluate(String str) {
-		double first = Character.getNumericValue(str.charAt(0));
-		double second = Character.getNumericValue(str.charAt(2));
-		char func = str.charAt(1);
-		String ans = "ERROR";
-		
-		switch(func) {
-		case '+':
-			ans = Integer.toString((int)first + (int)second);
-			break;
-		case '-':
-			ans = Integer.toString((int)first - (int)second);
-			break;
-		case '/':
-			if((int)second == 0)
-				ans = "ERROR";
-			else
-				ans = Double.toString(first / second);
-			break;
-		case '*':
-			ans = Integer.toString((int)first * (int)second);
-			break;
-		}
-		return ans;
-	}
 	@Override
 	public void run() {
-		//update the display according to the highlighted button, perform calculations if required 
-		switch(currentlyHighlighted) {
-		case 1: 
-			toAppend = Integer.toString(highlightedNum);
-			labelText = readText.concat(toAppend);		
-			break;
-		case 2:			
-			switch(highlightedFunc) {
-			case 1: 
-				toAppend = "+";
-				break;
-			case 2: 
-				toAppend = "-";
-				break;
-			case 3: 
-				toAppend = "/";
-				break;
-			case 4: 
-				toAppend = "*";
-				break;
-			}
-			labelText = readText.concat(toAppend);
-			break;
-		case 3:
-			toAppend = Integer.toString(highlightedNum);
-			labelText = readText.concat(toAppend);
-			break;
-		case 4:
-			switch(highlightedOp) {
-			case 1:
-				labelText = "";
-				break;
-			case 2: 
-				labelText = evaluate(readText);
-				break;
-			}
-			break;
-		case 5:
-			labelText = "";
-			//reset the display and buttons
+		while(true) {
+			toReset = (highlightedNum - 1) % 10;
+			
+			if(highlightedNum == 0)
+				toReset = 9;
+			
 			SwingUtilities.invokeLater(new Runnable() {
+
 				@Override
 				public void run() {
-					CalculatorUi.reset();
-				}			
+					CalculatorUiAdvanced.changeBg(1,toReset,false);
+					CalculatorUiAdvanced.changeBg(1,highlightedNum,true);				
+				}
+				
 			});
-			Highlighter.currentlyHighlighted = (Highlighter.currentlyHighlighted) % 5 + 1;
-			return;
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			highlightedNum = (highlightedNum + 1)% 10 ; 
 		}
 		
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				CalculatorUi.display.setText(labelText);
-			}			
-		});
-		
-		Highlighter.currentlyHighlighted = (Highlighter.currentlyHighlighted) % 5 + 1;
 	}
 	
 }
-/**
- * Class to handle the highlighter.
- */
-class Highlighter implements Runnable {
 
-	static volatile int highlightedNum;
-	static volatile int highlightedFunc;
-	static volatile int highlightedOp;
-	static volatile int currentlyHighlighted;
-	
-	/**
-	 * Constructor to set initial value to volatile variables.
-	 */
-	public Highlighter() {
-		highlightedNum = 1;
+class FuncHighLighter implements Runnable{
+
+	volatile int highlightedFunc;
+	int toReset;
+	public FuncHighLighter() {		
 		highlightedFunc = 1;
-		highlightedOp = 1;
-		currentlyHighlighted = 1;
 	}
 	
 	@Override
 	public void run() {
-		int prev,caseAdjuster;
-		while(true){
-			while(currentlyHighlighted == 5);
-			caseAdjuster = 0;
-			if(currentlyHighlighted == 3)
-				caseAdjuster = 2;
-			switch(currentlyHighlighted - caseAdjuster) {
-			case 1:	
-				SwingUtilities.invokeLater(new Runnable() {
-									
-					@Override
-					public void run() {
-						switch(highlightedNum) {
-						case 1: 
-							CalculatorUi.num0.setBackground(new Color(0, 102, 153));
-							CalculatorUi.num1.setBackground(new Color(255, 255, 0));
-							break;
-							
-						case 2:
-							CalculatorUi.num1.setBackground(new Color(0, 102, 153));
-							CalculatorUi.num2.setBackground(new Color(255, 255, 0));
-							break;
-							
-						case 3:
-							CalculatorUi.num2.setBackground(new Color(0, 102, 153));
-							CalculatorUi.num3.setBackground(new Color(255, 255, 0));
-							break;
-							
-						case 4:
-							CalculatorUi.num3.setBackground(new Color(0, 102, 153));
-							CalculatorUi.num4.setBackground(new Color(255, 255, 0));
-							break;
-							
-						case 5:
-							CalculatorUi.num4.setBackground(new Color(0, 102, 153));
-							CalculatorUi.num5.setBackground(new Color(255, 255, 0));
-							break;
-							
-						case 6:
-							CalculatorUi.num5.setBackground(new Color(0, 102, 153));
-							CalculatorUi.num6.setBackground(new Color(255, 255, 0));
-							break;
-							
-						case 7:
-							CalculatorUi.num6.setBackground(new Color(0, 102, 153));
-							CalculatorUi.num7.setBackground(new Color(255, 255, 0));
-							break;
-							
-						case 8:
-							CalculatorUi.num7.setBackground(new Color(0, 102, 153));
-							CalculatorUi.num8.setBackground(new Color(255, 255, 0));
-							break;
-							
-						case 9:
-							CalculatorUi.num8.setBackground(new Color(0, 102, 153));
-							CalculatorUi.num9.setBackground(new Color(255, 255, 0));
-							break;
-							
-						case 0:
-							CalculatorUi.num9.setBackground(new Color(0, 102, 153));
-							CalculatorUi.num0.setBackground(new Color(255, 255, 0));
-							break;
-						}
-						
-					}
-				});
-								
-				try {
-					Thread.sleep(1500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				highlightedNum = (highlightedNum + 1)%10;
-				break;
-				
-			case 2:
-				switch(highlightedFunc) {
-				case 1:
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							CalculatorUi.mul.setBackground(UIManager.getColor("OptionPane.foreground"));
-							CalculatorUi.plus.setBackground(new Color(255, 255, 0));
-						}					
-					});
-					break;
-				case 2:
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							CalculatorUi.plus.setBackground(UIManager.getColor("OptionPane.foreground"));
-							CalculatorUi.minus.setBackground(new Color(255, 255, 0));
-						}					
-					});
-					break;
-				case 3:
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							CalculatorUi.minus.setBackground(UIManager.getColor("OptionPane.foreground"));
-							CalculatorUi.div.setBackground(new Color(255, 255, 0));
-						}					
-					});
-					break;
-				case 4:
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							CalculatorUi.div.setBackground(UIManager.getColor("OptionPane.foreground"));
-							CalculatorUi.mul.setBackground(new Color(255, 255, 0));
-						}					
-					});
-					break;
-				}
-				try {
-					Thread.sleep(1500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				highlightedFunc = (highlightedFunc)%4 + 1;
-				break;
+		while(true) {
+			toReset = highlightedFunc - 1;
 			
-			case 4:
-				switch(highlightedOp) {
-				case 1:
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							CalculatorUi.equals.setBackground(new Color(51, 102, 255));
-							CalculatorUi.clear.setBackground(new Color(255, 255, 0));
-						}					
-					});
-					break;
-				case 2:
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							CalculatorUi.clear.setBackground(new Color(51, 102, 255));
-							CalculatorUi.equals.setBackground(new Color(255, 255, 0));
-						}					
-					});
-					break;					
+			if(highlightedFunc == 1)
+				toReset = 4;
+			
+			SwingUtilities.invokeLater(new Runnable() {
+				
+				@Override
+				public void run() {
+					CalculatorUiAdvanced.changeBg(2, toReset, false);
+					CalculatorUiAdvanced.changeBg(2, highlightedFunc, true);
 				}
-				try {
-					Thread.sleep(1500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				highlightedOp = (highlightedOp)%2 + 1;
-				break;
+			});
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
+			
+			highlightedFunc = highlightedFunc % 4 + 1;
+			
 		}
+		
 		
 	}
 	
 }
 
-/**
- * Class to handle UI.
- */
-public class CalculatorUi extends JFrame {
+class OpHighlighter implements Runnable {
+
+	volatile int highlightedOp;
+	int toReset;
+	
+	public OpHighlighter() {
+		highlightedOp = 1;
+	}
+	
+	@Override
+	public void run() {
+		while(true) {
+			
+			if(highlightedOp == 1)
+				toReset = 2;
+			else
+				toReset = 1;
+			
+			SwingUtilities.invokeLater(new Runnable() {
+							
+				@Override
+				public void run() {
+					CalculatorUiAdvanced.changeBg(3, toReset, false);
+					CalculatorUiAdvanced.changeBg(3, highlightedOp, true);
+				}
+			});
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			highlightedOp = highlightedOp % 2 + 1;
+			
+		}
+	}
+	
+}
+
+public class CalculatorUiAdvanced extends JFrame {
 
 	private JPanel contentPane;
-	JLabel test1;
+
+	//colors used for buttons for background and when highlighted
+	public static Color numBg = new Color(0, 102, 153);
+	public static Color numHighlighted = new Color(255, 255, 0);
+	public static Color funcBg = UIManager.getColor("OptionPane.foreground");
+	public static Color funcHighlighted =  new Color(255, 255, 0);
+	public static Color opBg = new Color(51, 102, 255);
+	public static Color opHighlighted = new Color(255, 255, 0);
+	
 	public static JLabel num1;
 	public static JLabel num2 ;
 	public static JLabel num3 ;
@@ -355,6 +168,118 @@ public class CalculatorUi extends JFrame {
 	/**
 	 * Launch the application.
 	 */
+	public static void changeBg(int type, int buttonNo, boolean highlight) {
+		switch(type) {
+		case 1:
+			switch(buttonNo) {
+			case 0:
+				if(highlight)
+					num0.setBackground(numHighlighted);
+				else
+					num0.setBackground(numBg);
+				break;
+			case 1:
+				if(highlight)
+					num1.setBackground(numHighlighted);
+				else
+					num1.setBackground(numBg);
+				break;
+			case 2:
+				if(highlight)
+					num2.setBackground(numHighlighted);
+				else
+					num2.setBackground(numBg);
+				break;
+			case 3:
+				if(highlight)
+					num3.setBackground(numHighlighted);
+				else
+					num3.setBackground(numBg);
+				break;
+			case 4:
+				if(highlight)
+					num4.setBackground(numHighlighted);
+				else
+					num4.setBackground(numBg);
+				break;
+			case 5:
+				if(highlight)
+					num5.setBackground(numHighlighted);
+				else
+					num5.setBackground(numBg);
+				break;
+			case 6:
+				if(highlight)
+					num6.setBackground(numHighlighted);
+				else
+					num6.setBackground(numBg);
+				break;
+			case 7:
+				if(highlight)
+					num7.setBackground(numHighlighted);
+				else
+					num7.setBackground(numBg);
+				break;
+			case 8:
+				if(highlight)
+					num8.setBackground(numHighlighted);
+				else
+					num8.setBackground(numBg);
+				break;
+			case 9:
+				if(highlight)
+					num9.setBackground(numHighlighted);
+				else
+					num9.setBackground(numBg);
+				break;
+			}
+			break;
+		case 2:
+			switch(buttonNo) {
+			case 1:
+				if(highlight)
+					plus.setBackground(funcHighlighted);
+				else
+					plus.setBackground(funcBg);
+				break;
+			case 2:
+				if(highlight)
+					minus.setBackground(funcHighlighted);
+				else
+					minus.setBackground(funcBg);
+				break;
+			case 3:
+				if(highlight)
+					div.setBackground(funcHighlighted);
+				else
+					div.setBackground(funcBg);
+				break;
+			case 4:
+				if(highlight)
+					mul.setBackground(funcHighlighted);
+				else
+					mul.setBackground(funcBg);
+				break;
+			}
+			break;
+		case 3:
+			switch(buttonNo) {
+			case 1:
+				if(highlight)
+					clear.setBackground(opHighlighted);
+				else
+					clear.setBackground(opBg);
+				break;
+			case 2:
+				if(highlight)
+					equals.setBackground(opHighlighted);
+				else
+					equals.setBackground(opBg);
+				break;
+			}
+			break;
+		}
+	}
 	public static void reset() {
 		display.setText("");
 		num1.setBackground(new Color(0, 102, 153));
@@ -381,11 +306,14 @@ public class CalculatorUi extends JFrame {
 		Highlighter.highlightedOp = 1;
 		Highlighter.currentlyHighlighted = 1;
 	}
+	/**
+	 * Launch the application.
+	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					CalculatorUi frame = new CalculatorUi();
+					CalculatorUiAdvanced frame = new CalculatorUiAdvanced();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -397,8 +325,8 @@ public class CalculatorUi extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public CalculatorUi() {
-		super("Calculator");
+	public CalculatorUiAdvanced() {
+		super("Advanced Calculator");
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -568,6 +496,6 @@ public class CalculatorUi extends JFrame {
 		mul.setBounds(205, 225, 55, 30);
 		contentPane.add(mul);
 		
-		
 	}
+
 }

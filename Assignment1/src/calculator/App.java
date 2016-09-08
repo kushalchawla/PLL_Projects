@@ -33,7 +33,7 @@ public class App {
      */
 	public static void main(String[] args) {
 		
-		//Create JFrame for the calculator
+		//Create initial UI for calculator
 		SwingUtilities.invokeLater(new Runnable() {
 			
 			@Override
