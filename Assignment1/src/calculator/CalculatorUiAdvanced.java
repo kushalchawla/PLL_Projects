@@ -7,6 +7,9 @@ import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,29 +39,18 @@ class AdvancedKeyPressResponse implements Runnable {
 		keyPressed = kp;
 	}
 	public String evaluate(String str) {
-		double first = Character.getNumericValue(str.charAt(0));
-		double second = Character.getNumericValue(str.charAt(2));
-		char func = str.charAt(1);
-		String ans = "ERROR";
-		
-		switch(func) {
-		case '+':
-			ans = Integer.toString((int)first + (int)second);
-			break;
-		case '-':
-			ans = Integer.toString((int)first - (int)second);
-			break;
-		case '/':
-			if((int)second == 0)
-				ans = "ERROR";
-			else
-				ans = Double.toString(first / second);
-			break;
-		case '*':
-			ans = Integer.toString((int)first * (int)second);
-			break;
-		}
-		return ans;
+		if(!ExpressionEval.validateExpression(str))
+			return "ERROR";
+		return ExpressionEval.evaluateExpression(str);
+//		ScriptEngineManager mgr = new ScriptEngineManager();
+//	    ScriptEngine engine = mgr.getEngineByName("JavaScript");
+//	    try {
+//			Double ans = (Double)engine.eval(str);
+//			return Double.toString(ans);
+//		} catch (ScriptException e) {			
+//			e.printStackTrace();
+//			return "ERROR";
+//		}
 	}
 	
 	@Override
@@ -93,9 +85,19 @@ class AdvancedKeyPressResponse implements Runnable {
 				break;
 			case 2: 
 				labelText = evaluate(readText);
+				CalculatorUiAdvanced.pauseMotion = true;
 				break;
 			}
 			break;
+		case KeyEvent.VK_CONTROL:
+			SwingUtilities.invokeLater(new Runnable() {				
+				@Override
+				public void run() {
+					CalculatorUiAdvanced.reset();
+				}
+			});
+			CalculatorUiAdvanced.pauseMotion = false;			
+			return;
 		}
 		
 		SwingUtilities.invokeLater(new Runnable() {
@@ -119,6 +121,7 @@ class NumHighlighter implements Runnable {
 	@Override
 	public void run() {
 		while(true) {
+			while(CalculatorUiAdvanced.pauseMotion);
 			toReset = (highlightedNum - 1) % 10;
 			
 			if(highlightedNum == 0)
@@ -158,6 +161,7 @@ class FuncHighlighter implements Runnable{
 	@Override
 	public void run() {
 		while(true) {
+			while(CalculatorUiAdvanced.pauseMotion);
 			toReset = highlightedFunc - 1;
 			
 			if(highlightedFunc == 1)
@@ -199,7 +203,7 @@ class OpHighlighter implements Runnable {
 	@Override
 	public void run() {
 		while(true) {
-			
+			while(CalculatorUiAdvanced.pauseMotion);
 			if(highlightedOp == 1)
 				toReset = 2;
 			else
@@ -232,6 +236,7 @@ public class CalculatorUiAdvanced extends JFrame {
 	private JPanel contentPane;
 
 	//colors used for buttons for background and when highlighted
+	public volatile static boolean pauseMotion;
 	public static Color numBg = new Color(0, 102, 153);
 	public static Color numHighlighted = new Color(255, 255, 0);
 	public static Color funcBg = UIManager.getColor("OptionPane.foreground");
@@ -258,7 +263,10 @@ public class CalculatorUiAdvanced extends JFrame {
 	public static JLabel display;
 	
 	/**
-	 * Launch the application.
+	 * function to change the background of buttons
+	 * @param type To identify the type of the key
+	 * @param buttonNo To identify the key
+	 * @param boolean to tell whether to highlight or reset the background 
 	 */
 	public static void changeBg(int type, int buttonNo, boolean highlight) {
 		switch(type) {
@@ -372,31 +380,32 @@ public class CalculatorUiAdvanced extends JFrame {
 			break;
 		}
 	}
+	
 	public static void reset() {
-		display.setText("");
-		num1.setBackground(new Color(0, 102, 153));
-		num2.setBackground(new Color(0, 102, 153));
-		num3.setBackground(new Color(0, 102, 153));
-		num4.setBackground(new Color(0, 102, 153));
-		num5.setBackground(new Color(0, 102, 153));
-		num6.setBackground(new Color(0, 102, 153));
-		num7.setBackground(new Color(0, 102, 153));
-		num8.setBackground(new Color(0, 102, 153));
-		num9.setBackground(new Color(0, 102, 153));
-		num0.setBackground(new Color(0, 102, 153));
+		if(display.getText() == "ERROR" || display.getText() == "Infinity")
+			display.setText("");
+		num1.setBackground(numBg);
+		num2.setBackground(numBg);
+		num3.setBackground(numBg);
+		num4.setBackground(numBg);
+		num5.setBackground(numBg);
+		num6.setBackground(numBg);
+		num7.setBackground(numBg);
+		num8.setBackground(numBg);
+		num9.setBackground(numBg);
+		num0.setBackground(numBg);
 		
-		clear.setBackground(new Color(51, 102, 255));
-		equals.setBackground(new Color(51, 102, 255));
+		clear.setBackground(opBg);
+		equals.setBackground(opBg);
 		
-		plus.setBackground(UIManager.getColor("OptionPane.foreground"));
-		minus.setBackground(UIManager.getColor("OptionPane.foreground"));
-		div.setBackground(UIManager.getColor("OptionPane.foreground"));
-		mul.setBackground(UIManager.getColor("OptionPane.foreground"));
+		plus.setBackground(funcBg);
+		minus.setBackground(funcBg);
+		div.setBackground(funcBg);
+		mul.setBackground(funcBg);
 		
-		Highlighter.highlightedNum = 1;
-		Highlighter.highlightedFunc = 1;
-		Highlighter.highlightedOp = 1;
-		Highlighter.currentlyHighlighted = 1;
+		NumHighlighter.highlightedNum = 1;
+		FuncHighlighter.highlightedFunc = 1;
+		OpHighlighter.highlightedOp = 1;
 	}
 	/**
 	 * Launch the application.
@@ -422,15 +431,20 @@ public class CalculatorUiAdvanced extends JFrame {
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
+				if(pauseMotion && e.getKeyCode() != KeyEvent.VK_CONTROL)
+					return;
 				if (	e.getKeyCode() == KeyEvent.VK_ENTER ||
 						e.getKeyCode() == KeyEvent.VK_SPACE ||
-						e.getKeyCode() == KeyEvent.VK_SHIFT) {
+						e.getKeyCode() == KeyEvent.VK_SHIFT ||
+						e.getKeyCode() == KeyEvent.VK_CONTROL) {
 					System.out.println("Special Key Pressed\nProcessing..");
 					AdvancedKeyPressResponse kpr = new AdvancedKeyPressResponse(display.getText(), e.getKeyCode());
 					AdvancedGlobalInfo.pool.execute(kpr);
 				}
 			}
 		});
+		pauseMotion = false;
+		
 		System.out.println("UI bana");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 270, 300);
