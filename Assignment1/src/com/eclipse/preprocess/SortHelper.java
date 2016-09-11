@@ -98,11 +98,19 @@ public class SortHelper extends RecursiveAction{
 		// TODO Auto-generated method stub
 		int[] arr = {23,45,2312,14,5,24,64,235,86};
 		
-		sortForkAndJoin(arr);
-		
+		System.out.format("Initial array: ");
 		for (int i = 0; i < arr.length; i++) {
 			System.out.format("%d,", arr[i]);
 		}
+		System.out.println();
+		
+		sortForkAndJoin(arr);
+				
+		System.out.format("Sorted array: ");
+		for (int i = 0; i < arr.length; i++) {
+			System.out.format("%d,", arr[i]);
+		}
+		System.out.println();
 
 	}
 
