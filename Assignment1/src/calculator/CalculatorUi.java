@@ -29,7 +29,7 @@ import javafx.scene.input.KeyCode;
 import java.awt.event.KeyAdapter;
 
 /**
- * Class to handle response to an Enter key press.
+ * Class to handle response to an Enter key-press.
  */
 class KeyPressResponse implements Runnable {
 
@@ -56,8 +56,12 @@ class KeyPressResponse implements Runnable {
 	/**
 	 * Function to compute the final result.
 	 * @param str String input from display to perform the evaluation.
+	 * @return the evaluated answer as a String
 	 */
 	public String evaluate(String str) {
+		if(str.length() != 3)
+			return "ERROR";
+		
 		double first = Character.getNumericValue(str.charAt(0));
 		double second = Character.getNumericValue(str.charAt(2));
 		char func = str.charAt(1);
@@ -79,6 +83,8 @@ class KeyPressResponse implements Runnable {
 		case '*':
 			ans = Integer.toString((int)first * (int)second);
 			break;
+		default:
+			return ans;
 		}
 		return ans;
 	}
@@ -134,6 +140,7 @@ class KeyPressResponse implements Runnable {
 			return;
 		}
 		
+		//update the display
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -146,7 +153,7 @@ class KeyPressResponse implements Runnable {
 	
 }
 /**
- * Class to handle the highlighter.
+ * Class to handle the highlighting of the keys.
  */
 class Highlighter implements Runnable {
 
@@ -156,7 +163,7 @@ class Highlighter implements Runnable {
 	static volatile int currentlyHighlighted;
 	
 	/**
-	 * Constructor to set initial value to volatile variables.
+	 * Constructor to set initial values of the state variables.
 	 */
 	public Highlighter() {
 		highlightedNum = 1;
@@ -237,7 +244,6 @@ class Highlighter implements Runnable {
 				try {
 					Thread.sleep(1500);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				highlightedNum = (highlightedNum + 1)%10;
@@ -352,8 +358,9 @@ public class CalculatorUi extends JFrame {
 	public static JLabel mul ;
 	public static JLabel display;
 	
+	
 	/**
-	 * Launch the application.
+	 * function to reset the calculator UI to the initial state
 	 */
 	public static void reset() {
 		display.setText("");
@@ -381,6 +388,7 @@ public class CalculatorUi extends JFrame {
 		Highlighter.highlightedOp = 1;
 		Highlighter.currentlyHighlighted = 1;
 	}
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -399,26 +407,26 @@ public class CalculatorUi extends JFrame {
 	 */
 	public CalculatorUi() {
 		super("Calculator");
+		
+		//eventListener to respond to key-press
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode()==KeyEvent.VK_ENTER){
 					System.out.println("Enter key pressed");
+					
+					//create the thread to process the key-press
 					KeyPressResponse kpr = new KeyPressResponse(display.getText());
 					GlobalInfo.pool.execute(kpr);
 				}
 			}
 		});
+		
 		System.out.println("UI bana");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 270, 300);
 		contentPane = new JPanel();
-		contentPane.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				System.out.println("pressed");
-			}
-		});
+		
 		contentPane.setBackground(UIManager.getColor("RadioButton.disabledText"));
 		contentPane.setBorder(new LineBorder(new Color(0, 0, 0), 5));
 		setContentPane(contentPane);

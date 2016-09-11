@@ -22,7 +22,7 @@ class GlobalInfo {
 }
 
 /**
- * Class to initiate the app and GUI.
+ * Class to initiate the calculator GUI and functionality
  */
 public class App {
 
@@ -44,6 +44,8 @@ public class App {
 				frame.setVisible(true);
 			}
 		});
+		
+		//creating the thread to highlight the keys periodically
 		Highlighter hl = new Highlighter();
 		GlobalInfo.pool.execute(hl);
 	}

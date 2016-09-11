@@ -21,6 +21,9 @@ import javax.swing.border.LineBorder;
 
 import javafx.scene.input.KeyCode;
 
+/**
+ * Class to handle response to an Enter key press.
+ */
 class AdvancedKeyPressResponse implements Runnable {
 
 	static int highlightedNum;
@@ -31,6 +34,11 @@ class AdvancedKeyPressResponse implements Runnable {
 	String readText;
 	int keyPressed;
 	
+	/**
+	 * A constructor to get the parameters from the UI for processing.
+	 * @param text to get the display text.  
+	 * @param kp to identify the key that is pressed.
+	 */
 	public AdvancedKeyPressResponse(String text, int kp) {
 		highlightedNum = NumHighlighter.highlightedNum;
 		highlightedFunc = FuncHighlighter.highlightedFunc;
@@ -38,23 +46,21 @@ class AdvancedKeyPressResponse implements Runnable {
 		readText = text;
 		keyPressed = kp;
 	}
+	
+	/**
+	 * @param str the input string to be evaluated
+	 * @return evaluated answer as a String
+	 */
 	public String evaluate(String str) {
 		if(!ExpressionEval.validateExpression(str))
 			return "ERROR";
 		return ExpressionEval.evaluateExpression(str);
-//		ScriptEngineManager mgr = new ScriptEngineManager();
-//	    ScriptEngine engine = mgr.getEngineByName("JavaScript");
-//	    try {
-//			Double ans = (Double)engine.eval(str);
-//			return Double.toString(ans);
-//		} catch (ScriptException e) {			
-//			e.printStackTrace();
-//			return "ERROR";
-//		}
 	}
 	
 	@Override
 	public void run() {
+		
+		//process the input according to the key pressed. 
 		switch(keyPressed) {
 		case KeyEvent.VK_ENTER:
 			toAppend = Integer.toString(highlightedNum);
@@ -90,16 +96,19 @@ class AdvancedKeyPressResponse implements Runnable {
 			}
 			break;
 		case KeyEvent.VK_CONTROL:
+			//reset the calculator to the initial state
 			SwingUtilities.invokeLater(new Runnable() {				
 				@Override
 				public void run() {
 					CalculatorUiAdvanced.reset();
 				}
 			});
+			//un-pause the highlighting
 			CalculatorUiAdvanced.pauseMotion = false;			
 			return;
 		}
 		
+		//update the display
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -110,10 +119,18 @@ class AdvancedKeyPressResponse implements Runnable {
 	
 }
 
+/**
+ * Class to highlight the number keys periodically
+ *
+ */
 class NumHighlighter implements Runnable {
 
 	volatile static int highlightedNum;
 	int toReset;
+	
+	/**
+	 * Constructor to initialize the current state 
+	 */
 	public NumHighlighter() {		
 		highlightedNum = 1;
 	}
@@ -121,7 +138,10 @@ class NumHighlighter implements Runnable {
 	@Override
 	public void run() {
 		while(true) {
+			//wait till highlighting is paused
 			while(CalculatorUiAdvanced.pauseMotion);
+			
+			//identifying the key which needs to be reset
 			toReset = (highlightedNum - 1) % 10;
 			
 			if(highlightedNum == 0)
@@ -131,12 +151,14 @@ class NumHighlighter implements Runnable {
 
 				@Override
 				public void run() {
+					//change backgrounds of the required keys
 					CalculatorUiAdvanced.changeBg(1,toReset,false);
 					CalculatorUiAdvanced.changeBg(1,highlightedNum,true);				
 				}
 				
 			});
 			
+			//wait for some time before highlighting the next key
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -150,10 +172,17 @@ class NumHighlighter implements Runnable {
 	
 }
 
+/**
+ * Class to highlight the function keys periodically
+ *
+ */
 class FuncHighlighter implements Runnable{
 
 	volatile static int highlightedFunc;
 	int toReset;
+	/**
+	 * Constructor to initialize the current state 
+	 */
 	public FuncHighlighter() {		
 		highlightedFunc = 1;
 	}
@@ -161,7 +190,10 @@ class FuncHighlighter implements Runnable{
 	@Override
 	public void run() {
 		while(true) {
+			//wait till highlighting is paused
 			while(CalculatorUiAdvanced.pauseMotion);
+			
+			//identifying the key which needs to be reset
 			toReset = highlightedFunc - 1;
 			
 			if(highlightedFunc == 1)
@@ -171,11 +203,13 @@ class FuncHighlighter implements Runnable{
 				
 				@Override
 				public void run() {
+					//change backgrounds of the required keys
 					CalculatorUiAdvanced.changeBg(2, toReset, false);
 					CalculatorUiAdvanced.changeBg(2, highlightedFunc, true);
 				}
 			});
 			
+			//wait for some time before highlighting the next key
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -191,19 +225,29 @@ class FuncHighlighter implements Runnable{
 	
 }
 
+/**
+ * Class to highlight the operator keys periodically
+ *
+ */
 class OpHighlighter implements Runnable {
 
 	volatile static int highlightedOp;
 	int toReset;
 	
+	/**
+	 * Constructor to initialize the current state 
+	 */
 	public OpHighlighter() {
 		highlightedOp = 1;
 	}
 	
 	@Override
 	public void run() {
+		//wait till highlighting is paused
 		while(true) {
 			while(CalculatorUiAdvanced.pauseMotion);
+			
+			//identifying the key which needs to be reset
 			if(highlightedOp == 1)
 				toReset = 2;
 			else
@@ -213,11 +257,13 @@ class OpHighlighter implements Runnable {
 							
 				@Override
 				public void run() {
+					//change backgrounds of the required keys
 					CalculatorUiAdvanced.changeBg(3, toReset, false);
 					CalculatorUiAdvanced.changeBg(3, highlightedOp, true);
 				}
 			});
 
+			//wait for some time before highlighting the next key
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -231,6 +277,10 @@ class OpHighlighter implements Runnable {
 	
 }
 
+/**
+ * Class to handle the UI
+ *
+ */
 public class CalculatorUiAdvanced extends JFrame {
 
 	private JPanel contentPane;
@@ -381,7 +431,13 @@ public class CalculatorUiAdvanced extends JFrame {
 		}
 	}
 	
+	
+	/**
+	 * function to reset the calculator UI to the initial state
+	 */
 	public static void reset() {
+		
+		//clear the text in display if it is not a number 
 		if(display.getText() == "ERROR" || display.getText() == "Infinity")
 			display.setText("");
 		num1.setBackground(numBg);
@@ -428,6 +484,8 @@ public class CalculatorUiAdvanced extends JFrame {
 	 */
 	public CalculatorUiAdvanced() {
 		super("Advanced Calculator");
+		
+		//eventListener to respond to key-press
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -438,11 +496,14 @@ public class CalculatorUiAdvanced extends JFrame {
 						e.getKeyCode() == KeyEvent.VK_SHIFT ||
 						e.getKeyCode() == KeyEvent.VK_CONTROL) {
 					System.out.println("Special Key Pressed\nProcessing..");
+					
+					//create the thread to process the key-press
 					AdvancedKeyPressResponse kpr = new AdvancedKeyPressResponse(display.getText(), e.getKeyCode());
 					AdvancedGlobalInfo.pool.execute(kpr);
 				}
 			}
 		});
+		
 		pauseMotion = false;
 		
 		System.out.println("UI bana");

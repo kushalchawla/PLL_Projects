@@ -1,7 +1,16 @@
 package calculator;
 
+/**
+ * Class to help in evaluating the expression
+ *
+ */
 public class ExpressionEval {
 
+	/**
+	 * @param str the expression to be evaluated
+	 * @return evaluated value of expression
+	 * Credits: Taken from stackoverflow.com
+	 */
 	public static double eval(final String str) {
 	    return new Object() {
 	        int pos = -1, ch;
@@ -82,12 +91,21 @@ public class ExpressionEval {
 	    }.parse();
 	}
 	
+	/**
+	 * @param expression the expression to be evaluated
+	 * @return String: the evaluated expression
+	 */
 	public static String evaluateExpression(String expression) {
 		Double ans = eval(expression);
 		return Double.toString(ans);
 	}
 	
+	/**
+	 * @param expression the expression to be evaluated
+	 * @return boolean: true if the expression is valid, otherwise false
+	 */
 	public static boolean validateExpression(String expression) {
+		
 		if(!Character.isDigit(expression.charAt(0)) || 
 				!Character.isDigit(expression.charAt(expression.length()-1)))
 			return false;
@@ -96,39 +114,25 @@ public class ExpressionEval {
 			if(!Character.isDigit(expression.charAt(i)) && !isOperator(expression.charAt(i)))
 				return false;
 		}
+		
 		for (int i = 0; i < expression.length()-1; i++) {
 			if(isOperator(expression.charAt(i)) && isOperator(expression.charAt(i+1)))
 				return false;
 		}
+		
 		return true;
 	}
-	public static String getValue(String postfix) {
-		return "ERROR";
-	}
-	public static String getPostfix(String expression) {
-		return "ERROR";
-	}
+	
+	/**
+	 * @param ch character to be checked
+	 * @return boolean: true if ch belongs to the set { +, -, /, *, . }
+	 */
 	public static boolean isOperator(char ch) {
 		if(ch == '+' || ch == '-' || ch == '/' || ch == '*' || ch == '.')
 			return true;
 		return false;
 	}
-	public static String getResult(String expression) {
-		
-		if(!Character.isDigit(expression.charAt(0)) || 
-				!Character.isDigit(expression.charAt(expression.length()-1)))
-			return "ERROR";
-		
-		for (int i = 0; i < expression.length(); i++) {
-			if(!Character.isDigit(expression.charAt(i)) && !isOperator(expression.charAt(i)))
-				return "ERROR";
-		}
-		
-		String postfix = getPostfix(expression);
-		String ans = getValue(postfix);
-		
-		return ans;
-	}
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
